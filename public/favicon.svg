@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Left book (darker green) -->
+  <rect x="3" y="6" width="11" height="20" rx="1.5" fill="#16a34a"/>
+  <rect x="3" y="6" width="2.5" height="20" rx="1" fill="#15803d"/>
+  <!-- Right book (lighter green) -->
+  <rect x="17" y="9" width="11" height="17" rx="1.5" fill="#4ade80"/>
+  <rect x="17" y="9" width="2.5" height="17" rx="1" fill="#16a34a"/>
+</svg>
