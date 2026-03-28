@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://openlibrary.org/works/OL7353617M.json\")",
+      "Bash(curl -s \"https://openlibrary.org/books/OL7353617M.json\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://openlibrary.org/books/OL7353617M.json\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL262052W.json\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL893415W.json\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL27516W.json\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL82563W.json\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL98927W.json\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''title''''\\)\\)\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL45804W.json\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL15626W.json\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL14933414W.json\")",
+      "Bash(curl -s \"https://openlibrary.org/works/OL5735335W.json\")"
+    ]
+  }
+}
