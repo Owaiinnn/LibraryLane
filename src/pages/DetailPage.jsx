@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useBooks } from '../context/BookContext'
 
 function DetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { removeBook } = useBooks()
   const [book, setBook] = useState(null)
   const [author, setAuthor] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -27,6 +29,11 @@ function DetailPage() {
     fetchBook()
   }, [id])
 
+  function handleTake() {
+    removeBook(id)
+    navigate('/')
+  }
+
   if (loading) return <p className="text-gray-500">Loading...</p>
   if (!book) return <p className="text-gray-500">Book not found.</p>
 
@@ -45,10 +52,17 @@ function DetailPage() {
         <p className="text-gray-700 leading-relaxed mb-6">{description}</p>
       )}
 
-      <div className="text-sm text-gray-400">
+      <div className="text-sm text-gray-400 mb-8">
         <p>OpenLibrary ID: {id}</p>
         {book.first_publish_date && <p>First published: {book.first_publish_date}</p>}
       </div>
+
+      <button
+        onClick={handleTake}
+        className="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition"
+      >
+        Take this book
+      </button>
     </div>
   )
 }
