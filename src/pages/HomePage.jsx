@@ -38,25 +38,58 @@ function HomePage() {
     fetchBooks()
   }, [bookIds])
 
-  if (loading) return <p className="text-gray-500">Loading books...</p>
-
-  if (books.length === 0) return <p className="text-gray-500">No books available right now.</p>
-
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Available Books</h1>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {books.map((book, i) => (
-          <Link
-            key={bookIds[i]}
-            to={`/book/${bookIds[i]}`}
-            className="border rounded-lg p-4 hover:shadow-md transition"
-          >
-            <h2 className="font-semibold text-lg">{book.title}</h2>
-            <p className="text-sm text-gray-500 mt-1">{book.authorName}</p>
-          </Link>
-        ))}
+      <div className="bg-green-50 border border-green-100 rounded-xl p-6 mb-8">
+        <h1 className="text-2xl font-bold text-green-800 mb-2">Welcome to LibraryLane 📚</h1>
+        <p className="text-gray-600">
+          A digital street library where you can discover and exchange books with others.
+          Browse what's available, take a book home, or add one you'd like to share.
+        </p>
       </div>
+
+      {loading && <p className="text-gray-500 text-center mt-10">Loading books...</p>}
+
+      {!loading && books.length === 0 && (
+        <div className="text-center mt-16">
+          <p className="text-gray-400 text-lg">No books available right now.</p>
+          <Link to="/search" className="text-green-700 underline mt-2 inline-block">Add the first one</Link>
+        </div>
+      )}
+
+      {!loading && books.length > 0 && (
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Available Books</h2>
+            <span className="text-sm text-gray-400">{books.length} {books.length === 1 ? 'book' : 'books'}</span>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {books.map((book, i) => (
+              <Link
+                key={bookIds[i]}
+                to={`/book/${bookIds[i]}`}
+                className="border rounded-xl overflow-hidden hover:shadow-md hover:border-green-400 transition"
+              >
+                {book.covers && book.covers[0] ? (
+                  <img
+                    src={`https://covers.openlibrary.org/b/id/${book.covers[0]}-M.jpg`}
+                    alt={book.title}
+                    className="w-full h-48 object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-300 text-4xl">
+                    📖
+                  </div>
+                )}
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg leading-snug mb-1">{book.title}</h3>
+                  <p className="text-sm text-gray-500">{book.authorName}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }

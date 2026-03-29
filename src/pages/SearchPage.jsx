@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useBooks } from '../context/BookContext'
 
 function SearchPage() {
@@ -51,15 +52,15 @@ function SearchPage() {
           const alreadyAdded = bookIds.includes(id)
 
           return (
-            <li key={id} className="border rounded-lg p-4 flex justify-between items-center">
-              <div>
+            <li key={id} className="border rounded-lg p-4 flex justify-between items-center gap-4">
+              <Link to={`/book/${id}`} className="flex-1 hover:underline">
                 <p className="font-semibold">{book.title}</p>
                 <p className="text-sm text-gray-500">{book.author_name ? book.author_name[0] : 'Unknown author'}</p>
-              </div>
+              </Link>
               <button
                 onClick={() => handleAdd(book)}
                 disabled={alreadyAdded}
-                className="text-sm px-3 py-1 rounded-lg border border-green-700 text-green-700 hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="text-sm px-3 py-1 rounded-lg border border-green-700 text-green-700 hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed transition shrink-0"
               >
                 {alreadyAdded ? 'Added' : 'Add'}
               </button>
