@@ -5,12 +5,13 @@ import { useBooks } from '../context/BookContext'
 function DetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { bookIds, addBook, removeBook } = useBooks()
+  const { bookIds, takenIds, addBook, removeBook } = useBooks()
   const [book, setBook] = useState(null)
   const [author, setAuthor] = useState(null)
   const [loading, setLoading] = useState(true)
 
   const isInLibrary = bookIds.includes(id)
+  const isTaken = takenIds.includes(id)
 
   useEffect(() => {
     async function fetchBook() {
@@ -85,6 +86,13 @@ function DetailPage() {
           className="bg-green-700 text-white px-6 py-2.5 rounded-lg hover:bg-green-800 transition font-medium"
         >
           Take this book
+        </button>
+      ) : isTaken ? (
+        <button
+          onClick={handleAdd}
+          className="border border-gray-300 text-gray-600 px-6 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium"
+        >
+          Hand back in
         </button>
       ) : (
         <button
