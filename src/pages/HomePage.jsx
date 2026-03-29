@@ -43,8 +43,8 @@ function HomePage() {
         <h1 className="text-2xl font-bold text-green-800 mb-3">Welcome to LibraryLane 📚</h1>
         <ul className="text-gray-600 space-y-1">
           <li>📖 Browse available books and read what they're about</li>
-          <li>➕ Search for a book and add it to the library</li>
-          <li>🏠 Take a book home or hand it back in</li>
+          <li>🏠 Take a book home and hand it back in when you're done</li>
+          <li>➕ Want to donate a book? Search for it and add it to the library</li>
         </ul>
       </div>
 

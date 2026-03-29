@@ -1,6 +1,19 @@
 # LibraryLane
 
-## Projectomschrijving – Straatbibliotheek
+Een digitale straatbibliotheek gebouwd in React. Gebruikers kunnen boeken bekijken, meenemen, teruggeven en doneren via de OpenLibrary API.
+
+## Opstarten
+
+```bash
+npm install
+npm run dev
+```
+
+---
+
+## De opdracht
+
+Projectomschrijving – Straatbibliotheek
 
 De Straatbibliotheek is een frontend-project gebouwd in React waarin gebruikers digitaal boeken kunnen ruilen via een eenvoudige webinterface. Het project maakt gebruik van de OpenLibrary.org API om boekinformatie op te halen.
 
