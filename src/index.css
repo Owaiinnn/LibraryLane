@@ -1,33 +1,3 @@
-/* ============================================================
-   index.css — GLOBAL STYLES
-   ============================================================
-   This file is imported in main.jsx, so these styles apply to
-   the entire application.
-
-   WHAT DOES @import "tailwindcss" DO?
-     It pulls in Tailwind CSS — a utility-first CSS framework.
-     Instead of writing custom CSS classes like .card { padding: 16px; },
-     you use pre-built utility classes directly in your JSX:
-       className="p-4"    → padding: 1rem
-       className="mt-2"   → margin-top: 0.5rem
-       className="flex"   → display: flex
-     This is why you see very little CSS in this file — almost all
-     styling is done via Tailwind classes in the JSX components.
-
-   WHY box-sizing: border-box?
-     By default, CSS adds padding and border OUTSIDE an element's
-     width/height. With border-box, padding and border are INCLUDED
-     in the width/height. This makes layouts much more predictable.
-     Example: a 200px wide box with 20px padding stays 200px total,
-     instead of becoming 240px.
-
-   WHY system-ui, sans-serif?
-     system-ui uses the operating system's default font (e.g., San Francisco
-     on macOS, Segoe UI on Windows). This makes the app feel native to
-     whatever platform the user is on, and loads instantly because the font
-     is already installed — no network request needed.
-   ============================================================ */
-
 @import "tailwindcss";
 
 * {
