@@ -9,6 +9,7 @@ function HomePage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Can't make the useEffect callback async — define an async function inside and call it
     async function fetchAll() {
       try {
         const fetchBook = async id => {
@@ -18,9 +19,11 @@ function HomePage() {
             const authorData = await fetch(`https://openlibrary.org${book.authors[0].author.key}.json`).then(res => res.json())
             authorName = authorData.name
           }
-          return { ...book, authorName }
+          return { ...book, authorName } // spread: copy all book properties + add authorName
         }
 
+        // Promise.all fires all fetches at the same time (parallel), much faster than one-by-one
+        // .map() turns each id into a Promise, Promise.all waits for all of them
         const [libraryResults, takenResults] = await Promise.all([
           Promise.all(bookIds.map(fetchBook)),
           Promise.all(takenIds.map(fetchBook)),
@@ -35,7 +38,7 @@ function HomePage() {
     }
 
     fetchAll()
-  }, [bookIds, takenIds])
+  }, [bookIds, takenIds]) // re-runs whenever bookIds or takenIds change (e.g. after adding a book)
 
   return (
     <div>
@@ -48,10 +51,11 @@ function HomePage() {
         </ul>
       </div>
 
+      {/* condition && <JSX /> — renders the JSX only if condition is true, otherwise nothing */}
       {loading && <p className="text-gray-500 text-center mt-10">Loading books...</p>}
 
       {!loading && (
-        <>
+        <>  {/* Fragment <> — lets you return multiple elements without adding an extra <div> */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Available Books</h2>
             <span className="text-sm text-gray-400">{books.length} {books.length === 1 ? 'book' : 'books'}</span>
@@ -65,6 +69,7 @@ function HomePage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10">
               {books.map((book, i) => (
+                // key must be unique per list item — use the book ID, not the index i
                 <Link
                   key={bookIds[i]}
                   to={`/book/${bookIds[i]}`}

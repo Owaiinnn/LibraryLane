@@ -3,22 +3,25 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useBooks } from '../context/BookContext'
 
 function DetailPage() {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { id } = useParams()       // reads the :id from the URL e.g. /book/OL82563W → "OL82563W"
+  const navigate = useNavigate()   // navigate('/') goes to homepage, navigate(-1) = browser back
   const { bookIds, takenIds, addBook, removeBook } = useBooks()
   const [book, setBook] = useState(null)
   const [author, setAuthor] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // Derived state — calculated from context, not stored separately (no duplicate sources of truth)
   const isInLibrary = bookIds.includes(id)
   const isTaken = takenIds.includes(id)
 
   useEffect(() => {
+    // useEffect callback can't be async directly, so define + call an async function inside
     async function fetchBook() {
       try {
         const bookData = await fetch(`https://openlibrary.org/works/${id}.json`).then(res => res.json())
         setBook(bookData)
 
+        // Author key comes from the book data — need a second fetch to get the actual name
         if (bookData.authors && bookData.authors[0]) {
           const authorData = await fetch(`https://openlibrary.org${bookData.authors[0].author.key}.json`).then(res => res.json())
           setAuthor(authorData)
@@ -30,7 +33,7 @@ function DetailPage() {
     }
 
     fetchBook()
-  }, [id])
+  }, [id]) // re-runs if the URL id changes
 
   function handleTake() {
     removeBook(id)
@@ -42,11 +45,13 @@ function DetailPage() {
     navigate('/')
   }
 
+  // Early returns — a React pattern to handle loading/error before the main JSX
   if (loading) return <p className="text-gray-500 mt-10 text-center">Loading...</p>
   if (!book) return <p className="text-gray-500 mt-10 text-center">Book not found.</p>
 
+  // API inconsistency: description can be a plain string OR { type, value } object — handle both
   const description = typeof book.description === 'object' ? book.description.value : book.description
-  const coverId = book.covers && book.covers[0]
+  const coverId = book.covers && book.covers[0] // && short-circuits if covers is undefined
 
   return (
     <div className="max-w-2xl">
@@ -80,6 +85,10 @@ function DetailPage() {
         <p className="text-gray-600 leading-relaxed mb-8">{description}</p>
       )}
 
+      {/* Chained ternary — if/else if/else:
+          isInLibrary → "Take this book"
+          isTaken     → "Hand back in"
+          else        → "Add to library" */}
       {isInLibrary ? (
         <button
           onClick={handleTake}

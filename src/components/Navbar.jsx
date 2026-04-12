@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 
 function Navbar() {
+  // useLocation() gives info about the current URL — we use .pathname to know which page we're on
   const location = useLocation()
 
   return (
@@ -9,6 +10,7 @@ function Navbar() {
         📚 LibraryLane
       </Link>
       <div className="flex gap-6">
+        {/* Template literal + ternary: conditionally adds 'underline' class for the active page */}
         <Link
           to="/"
           className={`text-sm font-medium hover:underline ${location.pathname === '/' ? 'underline' : ''}`}
