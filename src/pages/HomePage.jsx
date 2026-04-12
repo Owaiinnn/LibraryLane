@@ -3,42 +3,48 @@ import { Link } from 'react-router-dom'
 import { useBooks } from '../context/BookContext'
 
 function HomePage() {
-  const { bookIds, takenIds } = useBooks()
-  const [books, setBooks] = useState([])
+  const { bookIds, takenIds } = useBooks() // destructuring — pulls bookIds and takenIds out of context
+
+  // useState — creates a variable that React watches. when it changes, the page re-renders
+  const [books, setBooks] = useState([])       // books = current value, setBooks = function to update it
   const [takenBooks, setTakenBooks] = useState([])
   const [loading, setLoading] = useState(true)
 
+  // useEffect — runs code AFTER the component has rendered. used for things like API calls
+  // you can't fetch data during render itself, so useEffect is where side effects go
   useEffect(() => {
-    // Can't make the useEffect callback async — define an async function inside and call it
+    // async — marks a function so you can use await inside it
+    // await — pauses the function until the Promise resolves (e.g. until the fetch finishes)
     async function fetchAll() {
       try {
         const fetchBook = async id => {
+          // fetch() — sends an HTTP request to a URL and returns a Promise
+          // .then(res => res.json()) — once the response arrives, parse it as JSON
           const book = await fetch(`https://openlibrary.org/works/${id}.json`).then(res => res.json())
           let authorName = 'Unknown author'
           if (book.authors && book.authors[0]) {
             const authorData = await fetch(`https://openlibrary.org${book.authors[0].author.key}.json`).then(res => res.json())
             authorName = authorData.name
           }
-          return { ...book, authorName } // spread: copy all book properties + add authorName
+          return { ...book, authorName } // spread — copies all book properties into a new object and adds authorName
         }
 
-        // Promise.all fires all fetches at the same time (parallel), much faster than one-by-one
-        // .map() turns each id into a Promise, Promise.all waits for all of them
+        // Promise.all — sends all fetch requests at the same time instead of one by one
         const [libraryResults, takenResults] = await Promise.all([
-          Promise.all(bookIds.map(fetchBook)),
+          Promise.all(bookIds.map(fetchBook)), // .map() turns the id array into an array of Promises
           Promise.all(takenIds.map(fetchBook)),
         ])
 
         setBooks(libraryResults)
         setTakenBooks(takenResults)
-      } catch (err) {
+      } catch (err) { // try/catch — if anything inside try throws an error, catch handles it instead of crashing
         console.error('Failed to fetch books:', err)
       }
       setLoading(false)
     }
 
     fetchAll()
-  }, [bookIds, takenIds]) // re-runs whenever bookIds or takenIds change (e.g. after adding a book)
+  }, [bookIds, takenIds]) // dependency array — re-runs whenever bookIds or takenIds change
 
   return (
     <div>
@@ -51,17 +57,16 @@ function HomePage() {
         </ul>
       </div>
 
-      {/* condition && <JSX /> — renders the JSX only if condition is true, otherwise nothing */}
-      {loading && <p className="text-gray-500 text-center mt-10">Loading books...</p>}
+      {loading && <p className="text-gray-500 text-center mt-10">Loading books...</p>} {/* && conditional render — only shows while loading is true */}
 
       {!loading && (
-        <>  {/* Fragment <> — lets you return multiple elements without adding an extra <div> */}
+        <> {/* Fragment — lets you return multiple elements without adding a wrapping div to the DOM */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Available Books</h2>
-            <span className="text-sm text-gray-400">{books.length} {books.length === 1 ? 'book' : 'books'}</span>
+            <span className="text-sm text-gray-400">{books.length} {books.length === 1 ? 'book' : 'books'}</span> {/* ternary — singular vs plural */}
           </div>
 
-          {books.length === 0 ? (
+          {books.length === 0 ? ( // ternary — empty state message or the book grid
             <div className="text-center py-10 text-gray-400">
               <p>No books available right now.</p>
               <Link to="/search" className="text-green-700 underline mt-2 inline-block">Add the first one</Link>
@@ -69,9 +74,8 @@ function HomePage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10">
               {books.map((book, i) => (
-                // key must be unique per list item — use the book ID, not the index i
                 <Link
-                  key={bookIds[i]}
+                  key={bookIds[i]} // key prop — unique identifier so React can track each list item; use the id not the index
                   to={`/book/${bookIds[i]}`}
                   className="border rounded-xl overflow-hidden hover:shadow-md hover:border-green-400 transition"
                 >
@@ -95,7 +99,7 @@ function HomePage() {
             </div>
           )}
 
-          {takenBooks.length > 0 && (
+          {takenBooks.length > 0 && ( // && conditional render — only shows the My Books section if there are taken books
             <>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">My Books</h2>

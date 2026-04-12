@@ -3,26 +3,29 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useBooks } from '../context/BookContext'
 
 function DetailPage() {
-  const { id } = useParams()       // reads the :id from the URL e.g. /book/OL82563W → "OL82563W"
-  const navigate = useNavigate()   // navigate('/') goes to homepage, navigate(-1) = browser back
-  const { bookIds, takenIds, addBook, removeBook } = useBooks()
+  const { id } = useParams()       // useParams — pulls the :id value out of the current URL
+  const navigate = useNavigate()   // useNavigate — navigate('/') redirects home, navigate(-1) goes back
+  const { bookIds, takenIds, addBook, removeBook } = useBooks() // destructuring — pulls these four things out of context
+
+  // useState — creates a variable React watches. when it changes, the page re-renders
   const [book, setBook] = useState(null)
   const [author, setAuthor] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Derived state — calculated from context, not stored separately (no duplicate sources of truth)
-  const isInLibrary = bookIds.includes(id)
-  const isTaken = takenIds.includes(id)
+  const isInLibrary = bookIds.includes(id)  // derived state — calculated from context, not stored in useState
+  const isTaken = takenIds.includes(id)     // .includes() — returns true/false
 
+  // useEffect — runs code AFTER the component has rendered. used here to fetch book data from the API
   useEffect(() => {
-    // useEffect callback can't be async directly, so define + call an async function inside
-    async function fetchBook() {
-      try {
+    // async — marks a function so you can use await inside it
+    // await — pauses execution until the Promise resolves (e.g. until the API responds)
+    async function fetchBook() { // defined inside useEffect because the callback itself can't be async
+      try { // try/catch — if the fetch fails, catch handles the error instead of crashing the page
+        // fetch() — sends a request to the URL. .then(res => res.json()) parses the response as JSON
         const bookData = await fetch(`https://openlibrary.org/works/${id}.json`).then(res => res.json())
         setBook(bookData)
 
-        // Author key comes from the book data — need a second fetch to get the actual name
-        if (bookData.authors && bookData.authors[0]) {
+        if (bookData.authors && bookData.authors[0]) { // && guard — checks the property exists before accessing it
           const authorData = await fetch(`https://openlibrary.org${bookData.authors[0].author.key}.json`).then(res => res.json())
           setAuthor(authorData)
         }
@@ -33,7 +36,7 @@ function DetailPage() {
     }
 
     fetchBook()
-  }, [id]) // re-runs if the URL id changes
+  }, [id]) // dependency array — effect re-runs if the id in the URL changes
 
   function handleTake() {
     removeBook(id)
@@ -45,13 +48,13 @@ function DetailPage() {
     navigate('/')
   }
 
-  // Early returns — a React pattern to handle loading/error before the main JSX
+  // early return — stops rendering the rest of the component until data is ready
   if (loading) return <p className="text-gray-500 mt-10 text-center">Loading...</p>
   if (!book) return <p className="text-gray-500 mt-10 text-center">Book not found.</p>
 
-  // API inconsistency: description can be a plain string OR { type, value } object — handle both
+  // ternary — the API returns description as a plain string OR as an object with a .value property
   const description = typeof book.description === 'object' ? book.description.value : book.description
-  const coverId = book.covers && book.covers[0] // && short-circuits if covers is undefined
+  const coverId = book.covers && book.covers[0] // && short-circuit — safely gets the first cover id if it exists
 
   return (
     <div className="max-w-2xl">
@@ -60,7 +63,7 @@ function DetailPage() {
       </button>
 
       <div className="flex gap-6 mb-8">
-        {coverId ? (
+        {coverId ? ( // ternary — shows the cover image if there is one, otherwise a placeholder
           <img
             src={`https://covers.openlibrary.org/b/id/${coverId}-L.jpg`}
             alt={book.title}
@@ -74,7 +77,7 @@ function DetailPage() {
 
         <div>
           <h1 className="text-2xl font-bold mb-1">{book.title}</h1>
-          {author && <p className="text-green-700 font-medium mb-2">{author.name}</p>}
+          {author && <p className="text-green-700 font-medium mb-2">{author.name}</p>} {/* && conditional render — only shows if author was fetched */}
           {book.first_publish_date && (
             <p className="text-sm text-gray-400">First published: {book.first_publish_date}</p>
           )}
@@ -85,10 +88,7 @@ function DetailPage() {
         <p className="text-gray-600 leading-relaxed mb-8">{description}</p>
       )}
 
-      {/* Chained ternary — if/else if/else:
-          isInLibrary → "Take this book"
-          isTaken     → "Hand back in"
-          else        → "Add to library" */}
+      {/* chained ternary — checks isInLibrary first, then isTaken, then falls back to the else */}
       {isInLibrary ? (
         <button
           onClick={handleTake}

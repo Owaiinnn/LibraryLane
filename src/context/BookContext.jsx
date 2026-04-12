@@ -1,22 +1,20 @@
 import { createContext, useContext, useState } from 'react'
 
-// Step 1 — CREATE the context (the "channel" data flows through)
-const BookContext = createContext()
+const BookContext = createContext() // createContext — creates the context object the whole app shares
 
-// Custom hook so other components just call useBooks() instead of useContext(BookContext)
+// custom hook — a function that starts with "use" and wraps a React hook, just to make it easier to call
 export function useBooks() {
-  return useContext(BookContext) // Step 3 — CONSUME
+  return useContext(BookContext) // useContext — lets this component read the value from BookContext
 }
 
-// Step 2 — PROVIDE: wraps the whole app (in main.jsx) so every component can access the data
 export function BookProvider({ children }) {
 
-  // Lazy initialisation: pass a FUNCTION to useState so localStorage is only read once (on mount),
-  // not on every re-render. Without the arrow function it would run every render.
+  // useState — creates a variable React watches. when it changes, the page re-renders
+  // lazy initialisation — passing a function so localStorage is only read on first render, not every render
   const [bookIds, setBookIds] = useState(() => {
-    const saved = localStorage.getItem('bookIds')
+    const saved = localStorage.getItem('bookIds') // localStorage.getItem — reads saved data from the browser
     const defaults = ['OL82563W', 'OL45804W', 'OL102749W', 'OL893415W', 'OL261994W', 'OL59706W']
-    return saved ? JSON.parse(saved) : defaults
+    return saved ? JSON.parse(saved) : defaults // ternary — use saved data if it exists, otherwise the defaults
   })
 
   const [takenIds, setTakenIds] = useState(() => {
@@ -25,14 +23,12 @@ export function BookProvider({ children }) {
   })
 
   function addBook(id) {
-    if (bookIds.includes(id)) return // guard: don't add duplicates
-    // Spread [...bookIds, id] creates a NEW array — React won't detect a change if you push() to the same array
-    const updated = [...bookIds, id]
+    if (bookIds.includes(id)) return // guard clause — exits early if the book is already in the list
+    const updated = [...bookIds, id] // spread syntax — creates a new array instead of mutating the existing one
     setBookIds(updated)
-    localStorage.setItem('bookIds', JSON.stringify(updated)) // manually sync to localStorage
+    localStorage.setItem('bookIds', JSON.stringify(updated)) // localStorage.setItem — saves the updated array to the browser
 
-    // if handing back in, remove from taken list
-    const updatedTaken = takenIds.filter(t => t !== id) // .filter() also returns a new array
+    const updatedTaken = takenIds.filter(t => t !== id) // .filter() — returns a new array without the given id
     setTakenIds(updatedTaken)
     localStorage.setItem('takenIds', JSON.stringify(updatedTaken))
   }
@@ -42,14 +38,13 @@ export function BookProvider({ children }) {
     setBookIds(updated)
     localStorage.setItem('bookIds', JSON.stringify(updated))
 
-    // add to taken list
     const updatedTaken = [...takenIds, id]
     setTakenIds(updatedTaken)
     localStorage.setItem('takenIds', JSON.stringify(updatedTaken))
   }
 
-  // value = the data every consumer gets. Whenever any of these change, consumers re-render.
   return (
+    // Provider — wraps children and makes the value available to every component inside
     <BookContext.Provider value={{ bookIds, takenIds, addBook, removeBook }}>
       {children}
     </BookContext.Provider>
