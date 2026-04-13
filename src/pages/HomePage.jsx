@@ -3,35 +3,26 @@ import { Link } from 'react-router-dom'
 import { useBooks } from '../context/BookContext'
 
 function HomePage() {
-  const { bookIds, takenIds } = useBooks() // destructuring — pulls bookIds and takenIds out of context
-
-  // useState — creates a variable that React watches. when it changes, the page re-renders
-  const [books, setBooks] = useState([])       // books = current value, setBooks = function to update it
+  const { bookIds, takenIds } = useBooks() // these are pulled from bookcontext.
+  const [books, setBooks] = useState([]) //set up 3 pieces of state
   const [takenBooks, setTakenBooks] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // useEffect — runs code AFTER the component has rendered. used for things like API calls
-  // you can't fetch data during render itself, so useEffect is where side effects go
-  useEffect(() => {
-    // async — marks a function so you can use await inside it
-    // await — pauses the function until the Promise resolves (e.g. until the fetch finishes)
-    async function fetchAll() {
+  useEffect(() => { //this loads whenever bookids or taken ids change
+    async function fetchAll() { // lets you await
       try {
-        const fetchBook = async id => {
-          // fetch() — sends an HTTP request to a URL and returns a Promise
-          // .then(res => res.json()) — once the response arrives, parse it as JSON
-          const book = await fetch(`https://openlibrary.org/works/${id}.json`).then(res => res.json())
-          let authorName = 'Unknown author'
-          if (book.authors && book.authors[0]) {
+        const fetchBook = async id => { // arrow
+          const book = await fetch(`https://openlibrary.org/works/${id}.json`).then(res => res.json()) //parses body as json
+          let authorName = 'Unknown author' // let
+          if (book.authors && book.authors[0]) { // logical and. does have author key?
             const authorData = await fetch(`https://openlibrary.org${book.authors[0].author.key}.json`).then(res => res.json())
-            authorName = authorData.name
+            authorName = authorData.name //fixes unknown
           }
-          return { ...book, authorName } // spread — copies all book properties into a new object and adds authorName
+          return { ...book, authorName } // spread operator merginging into new object. short easy
         }
 
-        // Promise.all — sends all fetch requests at the same time instead of one by one
-        const [libraryResults, takenResults] = await Promise.all([
-          Promise.all(bookIds.map(fetchBook)), // .map() turns the id array into an array of Promises
+        const [libraryResults, takenResults] = await Promise.all([ // prevent website from freezing. not blocking while waiting.
+          Promise.all(bookIds.map(fetchBook)),
           Promise.all(takenIds.map(fetchBook)),
         ])
 
@@ -44,7 +35,7 @@ function HomePage() {
     }
 
     fetchAll()
-  }, [bookIds, takenIds]) // dependency array — re-runs whenever bookIds or takenIds change
+  }, [bookIds, takenIds]) // dependency array auto reruns whenever bookids or takenids change.
 
   return (
     <div>
@@ -57,7 +48,7 @@ function HomePage() {
         </ul>
       </div>
 
-      {loading && <p className="text-gray-500 text-center mt-10">Loading books...</p>} {/* && conditional render — only shows while loading is true */}
+      {loading && <p className="text-gray-500 text-center mt-10">Loading books...</p>}
 
       {!loading && (
         <> {/* Fragment — lets you return multiple elements without adding a wrapping div to the DOM */}
@@ -66,7 +57,7 @@ function HomePage() {
             <span className="text-sm text-gray-400">{books.length} {books.length === 1 ? 'book' : 'books'}</span> {/* ternary — singular vs plural */}
           </div>
 
-          {books.length === 0 ? ( // ternary — empty state message or the book grid
+          {books.length === 0 ? ( 
             <div className="text-center py-10 text-gray-400">
               <p>No books available right now.</p>
               <Link to="/search" className="text-green-700 underline mt-2 inline-block">Add the first one</Link>
@@ -86,6 +77,7 @@ function HomePage() {
                       className="w-full h-48 object-cover"
                     />
                   ) : (
+                    // fallback for no cover
                     <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-300 text-4xl">
                       📖
                     </div>
@@ -112,7 +104,7 @@ function HomePage() {
                     to={`/book/${takenIds[i]}`}
                     className="border rounded-xl overflow-hidden hover:shadow-md hover:border-gray-300 transition opacity-80"
                   >
-                    {book.covers && book.covers[0] ? (
+                    {book.covers && book.covers[0] ? ( // logical and? does have cover? if so convert. 
                       <img
                         src={`https://covers.openlibrary.org/b/id/${book.covers[0]}-M.jpg`}
                         alt={book.title}
